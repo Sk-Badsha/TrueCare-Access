@@ -1,20 +1,33 @@
 import React from "react";
-import { Flex, Form, Input } from "antd";
-import "../../styles/RegisterStyles.css";
-import { Link } from "react-router-dom";
+import { Flex, Form, Input, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 function Register() {
   // form handler
-  const onfinishHandler = (values) => {
-    console.log(values);
+  const navigate = useNavigate();
+  const onfinishHandler = async (values) => {
+    try {
+      const res = await axios.post("/api/v1/users/register", values);
+      console.log(res);
+
+      if (res.status >= 200 && res.status < 300) {
+        message.success(res.data.message); // Show success message if user is registered
+        navigate("/login");
+      } else {
+        message.error(res.data.message); // Show error message for 409 (user already exists)
+      }
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        message.error(error.response.data.message); // Display API error message if available
+      } else {
+        message.error("Something went wrong!"); // Fallback error message
+      }
+    }
   };
 
   return (
     <div className="form-container">
-      <Form
-        layout="vertical"
-        onFinish={onfinishHandler}
-        className="register-form"
-      >
+      <Form layout="vertical" onFinish={onfinishHandler} className="form-main">
         <h3 className="text-center">Register Now</h3>
         <Form.Item label="Name" name="name">
           <Input type="text" required></Input>
@@ -33,5 +46,4 @@ function Register() {
     </div>
   );
 }
-
 export default Register;

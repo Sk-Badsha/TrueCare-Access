@@ -6,6 +6,7 @@ const connectDB = async () => {
     const connectionInstance = await mongoose.connect(
       `${process.env.MONGODB_URL}/${DB_NAME}`
     );
+    console.log(process.env.DB_NAME);
 
     // this is for connecting to nosqlbooster for mongoDB interface
     // const connectionInstance = await mongoose.connect(
