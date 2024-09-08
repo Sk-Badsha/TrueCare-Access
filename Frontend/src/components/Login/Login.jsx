@@ -1,26 +1,34 @@
 import React from "react";
 import { Form, Input, Flex, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../../redux/features/alertSlice";
+import { login as authLogin } from "../../redux/features/authSlice";
+
 const App = () => {
   const navigate = useNavigate();
-  const onfinishHandler = async (values) => {
+  const dispatch = useDispatch();
+
+  const onFinishHandler = async (values) => {
     try {
+      dispatch(showLoading());
       const res = await axios.post("/api/v1/users/login", values);
-      console.log("Response: ", res);
-      navigate("/");
+      dispatch(hideLoading());
 
       if (res.data.success) {
         message.success(res.data.message || "Login successful!");
+        dispatch(authLogin(res.data.data.user));
+        navigate("/");
       } else {
         throw new Error(res.data.message || "Login failed");
       }
     } catch (error) {
+      dispatch(hideLoading());
       console.log("error: ", error);
 
       if (error.response && error.response.data) {
-        // If it's an ApiError from the server, show the server message
+        // If it's an API error from the server, show the server message
         message.error(error.response.data.message || "Something went wrong");
       } else {
         // If it's some other kind of error, display a generic message
@@ -28,22 +36,34 @@ const App = () => {
       }
     }
   };
+
   return (
     <div className="form-container">
-      <Form layout="vertical" onFinish={onfinishHandler} className="form-main">
+      <Form layout="vertical" onFinish={onFinishHandler} className="form-main">
         <h3 className="text-center">Login Now</h3>
-        <Form.Item label="Email" name="email">
-          <Input type="email" required></Input>
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: "Please input your email!" }]}
+        >
+          <Input type="email" required />
         </Form.Item>
-        <Form.Item label="Password" name="password">
-          <Input type="password" required></Input>
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: "Please input your password!" }]}
+        >
+          <Input type="password" required />
         </Form.Item>
         <Flex justify="space-between" align="center">
-          <button className="btn btn-success">Login</button>
+          <button className="btn btn-success" type="submit">
+            Login
+          </button>
           <Link to="/register">Register Now!</Link>
         </Flex>
       </Form>
     </div>
   );
 };
+
 export default App;

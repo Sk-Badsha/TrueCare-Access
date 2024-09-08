@@ -17,7 +17,6 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     if (!decodedToken) {
       throw new ApiError(404, "Token is not valid");
     }
-    console.log("Decoded Token: ", decodedToken);
 
     const user = await User.findById(decodedToken._id).select(
       "-password -refreshToken"

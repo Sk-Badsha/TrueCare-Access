@@ -2,21 +2,28 @@ import React from "react";
 import { Flex, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../../redux/features/alertSlice";
 function Register() {
   // form handler
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const onfinishHandler = async (values) => {
     try {
+      dispatch(showLoading());
       const res = await axios.post("/api/v1/users/register", values);
       console.log(res);
 
       if (res.status >= 200 && res.status < 300) {
+        dispatch(hideLoading());
         message.success(res.data.message); // Show success message if user is registered
         navigate("/login");
       } else {
+        dispatch(hideLoading());
         message.error(res.data.message); // Show error message for 409 (user already exists)
       }
     } catch (error) {
+      dispatch(hideLoading());
       if (error.response && error.response.data.message) {
         message.error(error.response.data.message); // Display API error message if available
       } else {
