@@ -98,4 +98,15 @@ const loginUser = asyncHandler(async (req, res) => {
       })
     );
 });
-export { registerUser, loginUser };
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const currentUser = req.user;
+
+  if (!currentUser) throw new ApiError(401, "no current user available");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "successfully got current user", currentUser));
+});
+
+export { registerUser, loginUser, getCurrentUser };
