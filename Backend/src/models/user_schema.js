@@ -20,6 +20,22 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    isDoctor: {
+      type: Boolean,
+      default: false,
+    },
+    notification: {
+      type: Array,
+      default: [],
+    },
+    seenNotification: {
+      type: Array,
+      default: [],
+    },
   },
   { timestamps: true }
 );

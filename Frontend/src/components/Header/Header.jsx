@@ -21,7 +21,7 @@ function Header() {
     },
   ];
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav className="navbar navbar-expand-lg bg-body-red">
       <div className="container-fluid">
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
@@ -30,7 +30,7 @@ function Header() {
                 <li className="nav-item" key={item.slug}>
                   <NavLink
                     className={({ isActive }) =>
-                      `nav-link ${isActive ? "active" : ""}`
+                      ` nav-link ${isActive ? "active" : ""}`
                     }
                     aria-current="page"
                     to={item.slug}

@@ -3,20 +3,21 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // or use `sessionStorage` if you prefer
 import alertSlice from "./features/alertSlice";
 import authSlice from "./features/authSlice";
-
+import { combineReducers } from "@reduxjs/toolkit";
 const persistConfig = {
   key: "root",
   storage,
+  whitelists: ["auth"],
 };
+const rootReducer = combineReducers({
+  auth: authSlice,
+  alerts: alertSlice,
+});
 
-const persistedAlertReducer = persistReducer(persistConfig, alertSlice);
-const persistedAuthReducer = persistReducer(persistConfig, authSlice);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: {
-    alerts: persistedAlertReducer,
-    auth: persistedAuthReducer,
-  },
+  reducer: persistedReducer,
 });
 
 export const persistor = persistStore(store);
