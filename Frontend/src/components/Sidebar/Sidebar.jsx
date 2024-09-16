@@ -4,9 +4,9 @@ import "../../styles/SidebarStyles.css";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authSlice.js";
 import axios from "axios";
-
+import { message } from "antd";
 // Navigation Items
-const navItems = [
+const userMenu = [
   {
     name: "Home",
     icon: "fa-solid fa-house",
@@ -29,6 +29,29 @@ const navItems = [
   },
 ];
 
+const adminMenu = [
+  {
+    name: "Home",
+    icon: "fa-solid fa-house",
+    slug: "/dashboard",
+  },
+  {
+    name: "Doctors",
+    icon: "fa-solid fa-user-doctor",
+    slug: "/doctors",
+  },
+  {
+    name: "Users",
+    icon: "fa-solid fa-users ",
+    slug: "/users",
+  },
+  {
+    name: "Profiles",
+    icon: "fa-solid fa-user-tie",
+    slug: "/profiles",
+  },
+];
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -37,20 +60,18 @@ const Sidebar = () => {
       await axios.post("/api/v1/users/logout");
       dispatch(logout()); // Clear user data in Redux
       navigate("/login"); // Redirect to login page
+      message.success("logout Successfully");
     } catch (error) {
       console.error("Logout failed:", error);
-      dispatch(logout());
-      navigate("/login");
     }
   };
   const user = useSelector((state) => state.auth.userData);
   const [isOpen, setIsOpen] = useState(true);
+  const navItems = user.isAdmin ? adminMenu : userMenu;
 
   // Function to handle toggle
   const toggleSidebar = () => {
-    console.log("Before ", isOpen);
     setIsOpen((prev) => !prev);
-    console.log("After", isOpen);
   };
 
   return (

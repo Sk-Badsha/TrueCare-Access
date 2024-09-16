@@ -1,10 +1,13 @@
 import React from "react";
-import { Register as RegisterComponents } from "../components/index.js";
+import {
+  Register as RegisterComponents,
+  Container,
+} from "../components/index.js";
 function Register() {
   return (
-    <div>
+    <Container>
       <RegisterComponents />
-    </div>
+    </Container>
   );
 }
 

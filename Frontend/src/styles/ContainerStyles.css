@@ -11,3 +11,24 @@
     padding: 30px;
     width: 30%;
 }
+
+.form-wrapper {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.form-btn {
+    display: flex;
+    justify-content: end;
+    margin-top: 25px;
+}
+
+.form-btn>button {
+    width: 100px;
+}
+
+.form-btn>button:hover {
+    cursor: pointer;
+
+}

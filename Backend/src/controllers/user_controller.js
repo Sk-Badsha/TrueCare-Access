@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user_schema.js";
+import { Doctor } from "../models/doctor_schema.js";
 
 import jwt from "jsonwebtoken";
 
@@ -45,9 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   // Select fields to return (excluding sensitive data)
-  const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
+  const createdUser = await User.findById(user._id).select("-password");
 
   if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering user");
@@ -134,4 +133,45 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-export { registerUser, loginUser, getCurrentUser, logoutUser };
+const applyDoctor = asyncHandler(async (req, res) => {
+  const doctor = await Doctor.create({
+    ...req.body,
+    status: pending,
+  });
+
+  // Select fields to return (excluding sensitive data)
+  const createdDoctor = await Doctor.findById(doctor._id).select("-password");
+
+  if (!createdDoctor) {
+    throw new ApiError(500, "Something went wrong while registering user");
+  }
+
+  const adminUser = await User.findOne({ isAdmin: true });
+  const notification = adminUser.notification;
+  notification.push({
+    type: "apply-doctor-request",
+    message: `${createdDoctor.FirstName} ${createdDoctor.lastName} has applied for a doctor account`,
+    data: {
+      doctorID: createdDoctor._id,
+      name: createdDoctor.FirstName + " " + createdDoctor.lastName,
+      onClickPath: "/admin/doctors",
+    },
+  });
+
+  const response = await User.findByIdAndUpdate(adminUser._id, {
+    notification,
+  });
+
+  if (!response) {
+    await User.findByIdAndDelete(createdDoctor._id);
+    throw new ApiError(500, "Something went wrong while applying doctor");
+  }
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, "Doctor Account Applied Successfully", createdDoctor)
+    );
+});
+
+export { registerUser, loginUser, getCurrentUser, logoutUser, applyDoctor };

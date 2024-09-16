@@ -4,12 +4,11 @@ import "./index.css";
 import {
   Home,
   About,
-  Register,
-  Login,
   AuthInput,
   Dashboard,
   UpdateUser,
 } from "./components/index.js";
+import { Register, Login, AddDoctor } from "./pages/index.js";
 import Layout from "./Layout.jsx";
 import store, { persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
@@ -21,7 +20,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import React from "react";
-import AuthenticatedLayout from "./AuthenticatedLayout.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -72,6 +70,14 @@ const router = createBrowserRouter(
           element={
             <AuthInput authentication>
               <UpdateUser />
+            </AuthInput>
+          }
+        />
+        <Route
+          path="/apply-doctor"
+          element={
+            <AuthInput authentication>
+              <AddDoctor />
             </AuthInput>
           }
         />

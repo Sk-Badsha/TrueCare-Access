@@ -11,6 +11,7 @@ import Sidebar from "./Sidebar/Sidebar.jsx";
 import ContentHeader from "./ContentHeader/ContentHeader.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
 import UpdateUser from "./UpdateUser/UpdateUser.jsx";
+import AddDoctor from "./AddDoctor/AddDoctor.jsx";
 export {
   Header,
   Home,
@@ -25,4 +26,5 @@ export {
   ContentHeader,
   Dashboard,
   UpdateUser,
+  AddDoctor,
 };
