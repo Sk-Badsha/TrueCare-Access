@@ -38,12 +38,12 @@ const adminMenu = [
   {
     name: "Doctors",
     icon: "fa-solid fa-user-doctor",
-    slug: "/doctors",
+    slug: "/admin/doctors",
   },
   {
     name: "Users",
     icon: "fa-solid fa-users ",
-    slug: "/users",
+    slug: "/admin/users",
   },
   {
     name: "Profiles",

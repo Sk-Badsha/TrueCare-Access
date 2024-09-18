@@ -136,8 +136,12 @@ const logoutUser = asyncHandler(async (req, res) => {
 const applyDoctor = asyncHandler(async (req, res) => {
   const doctor = await Doctor.create({
     ...req.body,
-    status: pending,
+    status: "pending",
   });
+
+  if (!doctor) {
+    throw new ApiError(404, "Error while creating doctor");
+  }
 
   // Select fields to return (excluding sensitive data)
   const createdDoctor = await Doctor.findById(doctor._id).select("-password");
@@ -150,11 +154,11 @@ const applyDoctor = asyncHandler(async (req, res) => {
   const notification = adminUser.notification;
   notification.push({
     type: "apply-doctor-request",
-    message: `${createdDoctor.FirstName} ${createdDoctor.lastName} has applied for a doctor account`,
+    message: `${createdDoctor.firstName} ${createdDoctor.lastName} has applied for a doctor account`,
     data: {
       doctorID: createdDoctor._id,
-      name: createdDoctor.FirstName + " " + createdDoctor.lastName,
-      onClickPath: "/admin/doctors",
+      name: createdDoctor.firstName + " " + createdDoctor.lastName,
+      onClickPath: "/doctors",
     },
   });
 
@@ -174,4 +178,56 @@ const applyDoctor = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser, getCurrentUser, logoutUser, applyDoctor };
+const getAllNotification = asyncHandler(async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userId);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.body.userId,
+      {
+        $push: { seenNotification: { $each: user.notification } },
+        $set: { notification: [] },
+      },
+      { new: true } // Return the updated document
+    ).select("-password -refreshToken");
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, "all notification marked as read", updatedUser)
+      );
+  } catch (error) {
+    throw new ApiError(500, "Error in notification", error);
+  }
+});
+
+const deleteAllNotification = asyncHandler(async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.body.userId,
+      {
+        $set: { notification: [], seenNotification: [] },
+      },
+      { new: true } // Return the updated document
+    ).select("-password -refreshToken");
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "all notification deleted successfully",
+          updatedUser
+        )
+      );
+  } catch (error) {
+    throw new ApiError(500, "Unable to delete all notification", error);
+  }
+});
+
+export {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  logoutUser,
+  applyDoctor,
+  getAllNotification,
+  deleteAllNotification,
+};

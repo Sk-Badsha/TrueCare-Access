@@ -1,9 +1,38 @@
 import React from "react";
 import { Form, message, Row, Col, Input, TimePicker } from "antd";
+import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { showLoading, hideLoading } from "../../redux/features/alertSlice.js";
 function AddDoctor() {
+  const user = useSelector((state) => state.auth.userData);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const finishHandler = async (values) => {
     try {
+      console.log("On try block add doctor");
+
+      dispatch(showLoading());
+      const res = await axios.post(
+        "/api/v1/users/apply-doctor",
+        { ...values, userId: user._id },
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(hideLoading());
+      console.log("On try block add doctor after network calling");
+      if (res.data.success) {
+        console.log(res);
+
+        message.success(res.data.message);
+        navigate("/dashboard");
+      } else {
+        message.error(res.data.message);
+      }
     } catch (error) {
+      dispatch(hideLoading());
       console.log(error.message);
       message.error(error.message);
     }

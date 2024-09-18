@@ -9,6 +9,7 @@ import Spinner from "./Spinner/spinner.jsx";
 import AuthInput from "./AuthInput/AuthInput.jsx";
 import Sidebar from "./Sidebar/Sidebar.jsx";
 import ContentHeader from "./ContentHeader/ContentHeader.jsx";
+import Notification from "./ContentHeader/Notification.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
 import UpdateUser from "./UpdateUser/UpdateUser.jsx";
 import AddDoctor from "./AddDoctor/AddDoctor.jsx";
@@ -27,4 +28,5 @@ export {
   Dashboard,
   UpdateUser,
   AddDoctor,
+  Notification,
 };

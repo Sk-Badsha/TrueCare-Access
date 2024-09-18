@@ -6,13 +6,18 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    cursor: pointer;
 
+}
+
+Badge>.bedge {
+    padding-right: 30px;
 }
 
 .content-header i {
     margin-top: 7px;
     margin-right: 10px;
-    color: rgba(235, 57, 57, 0.885);
+    color: rgba(28, 27, 27, 0.885);
 }
 
 .content-header a {
