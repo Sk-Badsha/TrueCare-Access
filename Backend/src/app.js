@@ -29,8 +29,10 @@ app.use(cookieParser());
 
 //routes import
 import UserRouter from "./routes/user_routers.js";
+import AdminRouter from "./routes/admin_routers.js";
 
 app.use("/api/v1/users", UserRouter);
+app.use("/api/v1/admin", AdminRouter);
 
 // Global error-handling middleware (should be written after routes)
 app.use((err, req, res, next) => {

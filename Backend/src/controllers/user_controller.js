@@ -4,8 +4,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user_schema.js";
 import { Doctor } from "../models/doctor_schema.js";
 
-import jwt from "jsonwebtoken";
-
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -134,6 +132,14 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const applyDoctor = asyncHandler(async (req, res) => {
+  const existedDoctor = await Doctor.findOne({
+    userId: req.user._id,
+  });
+
+  if (existedDoctor) {
+    throw new ApiError(404, "Doctor Already Applied");
+  }
+
   const doctor = await Doctor.create({
     ...req.body,
     status: "pending",

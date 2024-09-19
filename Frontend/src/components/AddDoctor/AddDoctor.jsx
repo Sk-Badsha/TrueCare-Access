@@ -11,8 +11,6 @@ function AddDoctor() {
 
   const finishHandler = async (values) => {
     try {
-      console.log("On try block add doctor");
-
       dispatch(showLoading());
       const res = await axios.post(
         "/api/v1/users/apply-doctor",
@@ -33,8 +31,11 @@ function AddDoctor() {
       }
     } catch (error) {
       dispatch(hideLoading());
-      console.log(error.message);
-      message.error(error.message);
+      if (error.status === 404) {
+        message.error("User already applied for a Doctor Account");
+      } else {
+        message.error(error.message);
+      }
     }
   };
   return (

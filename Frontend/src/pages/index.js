@@ -4,5 +4,5 @@ import Login from "./Login.jsx";
 import Register from "./Register.jsx";
 import Doctors from "./Admin/Doctors.jsx";
 import Users from "./Admin/Users.jsx";
-
-export { AddDoctor, HomePage, Login, Register, Doctors, Users };
+import Profile from "./Doctor/Profile.jsx";
+export { AddDoctor, HomePage, Login, Register, Doctors, Users, Profile };

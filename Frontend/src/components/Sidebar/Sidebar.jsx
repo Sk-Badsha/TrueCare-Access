@@ -4,53 +4,9 @@ import "../../styles/SidebarStyles.css";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authSlice.js";
 import axios from "axios";
+import { adminMenu, userMenu, doctorMenu } from "./Data.js";
 import { message } from "antd";
 // Navigation Items
-const userMenu = [
-  {
-    name: "Home",
-    icon: "fa-solid fa-house",
-    slug: "/dashboard",
-  },
-  {
-    name: "Appointments",
-    icon: "fa-solid fa-list-check",
-    slug: "/appointments",
-  },
-  {
-    name: "Apply Doctor",
-    icon: "fa-solid fa-user-doctor",
-    slug: "/apply-doctor",
-  },
-  {
-    name: "Update Profile",
-    icon: "fa-regular fa-user",
-    slug: "/update-user",
-  },
-];
-
-const adminMenu = [
-  {
-    name: "Home",
-    icon: "fa-solid fa-house",
-    slug: "/dashboard",
-  },
-  {
-    name: "Doctors",
-    icon: "fa-solid fa-user-doctor",
-    slug: "/admin/doctors",
-  },
-  {
-    name: "Users",
-    icon: "fa-solid fa-users ",
-    slug: "/admin/users",
-  },
-  {
-    name: "Profiles",
-    icon: "fa-solid fa-user-tie",
-    slug: "/profiles",
-  },
-];
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -66,8 +22,20 @@ const Sidebar = () => {
     }
   };
   const user = useSelector((state) => state.auth.userData);
+
+  console.log(user);
+
   const [isOpen, setIsOpen] = useState(true);
-  const navItems = user.isAdmin ? adminMenu : userMenu;
+  let navItems;
+  if (user.isAdmin) {
+    navItems = adminMenu;
+  } else if (user.isDoctor) {
+    navItems = doctorMenu;
+  } else {
+    navItems = userMenu;
+  }
+
+  console.log(navItems);
 
   // Function to handle toggle
   const toggleSidebar = () => {

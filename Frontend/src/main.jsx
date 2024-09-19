@@ -6,10 +6,11 @@ import {
   About,
   AuthInput,
   Dashboard,
-  UpdateUser,
   Notification,
 } from "./components/index.js";
-import { Register, Login, AddDoctor, Doctors, Users } from "./pages/index.js";
+import { Register, Login, AddDoctor, Profile } from "./pages/index.js";
+import Doctors, { doctorsLoader } from "./pages/Admin/Doctors.jsx";
+import Users, { usersLoader } from "./pages/Admin/Users.jsx";
 import Layout from "./Layout.jsx";
 import store, { persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
@@ -67,10 +68,10 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          path="/update-user"
+          path="/doctor/update-profile/:id"
           element={
             <AuthInput authentication>
-              <UpdateUser />
+              <Profile />
             </AuthInput>
           }
         />
@@ -92,18 +93,20 @@ const router = createBrowserRouter(
           }
         />
         <Route
+          loader={usersLoader}
           path="/admin/users"
           element={
             <AuthInput authentication>
-              <Doctors />
+              <Users />
             </AuthInput>
           }
         />
         <Route
+          loader={doctorsLoader}
           path="/admin/doctors"
           element={
             <AuthInput authentication>
-              <Users />
+              <Doctors />
             </AuthInput>
           }
         />
