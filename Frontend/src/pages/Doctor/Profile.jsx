@@ -1,10 +1,10 @@
 import React from "react";
-import { Container, UpdateUser } from "../../components/index.js";
+import { Container, UpdateDoctor } from "../../components/index.js";
 
 function Profile() {
   return (
     <Container>
-      <UpdateUser />
+      <UpdateDoctor />
     </Container>
   );
 }

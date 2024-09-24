@@ -11,8 +11,9 @@ import Sidebar from "./Sidebar/Sidebar.jsx";
 import ContentHeader from "./ContentHeader/ContentHeader.jsx";
 import Notification from "./ContentHeader/Notification.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
-import UpdateUser from "./UpdateUser/UpdateUser.jsx";
+import UpdateDoctor from "./UpdateDoctor/UpdateDoctor.jsx";
 import AddDoctor from "./AddDoctor/AddDoctor.jsx";
+import Appointments from "./Appointments/Appointments.jsx";
 export {
   Header,
   Home,
@@ -26,7 +27,8 @@ export {
   Sidebar,
   ContentHeader,
   Dashboard,
-  UpdateUser,
+  UpdateDoctor,
   AddDoctor,
   Notification,
+  Appointments,
 };

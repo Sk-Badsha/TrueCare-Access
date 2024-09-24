@@ -5,14 +5,43 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { showLoading, hideLoading } from "../../redux/features/alertSlice.js";
 import { updateUser } from "../../redux/features/authSlice.js";
+import { useEffect } from "react";
 import axios from "axios";
 
 function Notification() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.auth.userData);
+  const user = useSelector((state) => state.auth?.userData);
+  // Fetch notifications when the component mounts
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        dispatch(showLoading());
+        const res = await axios.post(
+          "/api/v1/users/getAllNotificationsByID",
+          { userId: user._id },
+          { withCredentials: true }
+        );
+        dispatch(hideLoading());
+        if (res.data.success) {
+          dispatch(
+            updateUser({
+              ...user,
+              notification: res.data.data.notification,
+              seenNotification: res.data.data.seenNotification,
+            })
+          );
+        } else {
+          message.error(res.data?.message);
+        }
+      } catch (error) {
+        dispatch(hideLoading());
+        message.error("Failed to fetch notifications.");
+      }
+    };
 
-  // Function to mark all notifications as read
+    fetchNotifications();
+  }, [dispatch, user._id]);
   const handleMarkAllRead = async () => {
     try {
       dispatch(showLoading());
@@ -60,54 +89,53 @@ function Notification() {
 
   return (
     <Container>
-      <p className="m-3 text-center fs-2 fw-bold">Notification Page</p>
-      <Tabs className="border border-1 border-primary">
-        <Tabs.TabPane tab="unread" key={0}>
+      <p className="m-3 text-center fs-1 fw-bold text-primary">Notifications</p>
+      <Tabs className="border rounded-3 shadow-sm" tabBarGutter={60}>
+        <Tabs.TabPane tab="Unread" key="0">
           <div className="d-flex justify-content-end">
             <p
               className="fs-5 link-primary text-primary"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", fontWeight: "600" }}
               onClick={handleMarkAllRead}
             >
               Mark all Read
             </p>
           </div>
-          {user?.notification?.map((msg) => (
+          {user?.notification?.map((msg, index) => (
             <div
-              className="card"
-              key={msg.data.doctorID}
-              style={{ cursor: "pointer" }}
+              key={index}
+              className="card mb-3 border-0 shadow-sm"
+              style={{ cursor: "pointer", borderRadius: "10px" }}
+              onClick={() => navigate(`${msg.onClickPath}`)}
             >
-              <div
-                className="card-text"
-                onClick={() => navigate(msg.data.onClickPath)}
-              >
-                {msg.message}
+              <div className="card-body">
+                <p className="card-text fs-5">{msg.message}</p>
               </div>
             </div>
           ))}
         </Tabs.TabPane>
-        <Tabs.TabPane tab="read" key={1}>
+
+        <Tabs.TabPane tab="Read" key="1">
           <div className="d-flex justify-content-end">
             <p
-              className="fs-5 text-danger link-danger"
-              style={{ cursor: "pointer" }}
+              className="fs-5 text-danger"
+              style={{ cursor: "pointer", fontWeight: "600" }}
               onClick={handleDeleteAllRead}
             >
               Delete all Read
             </p>
           </div>
-          {user?.seenNotification?.map((msg) => (
+          {user?.seenNotification?.map((msg, index) => (
             <div
-              className="card"
-              key={msg.data.doctorID}
-              style={{ cursor: "pointer" }}
+              key={index}
+              className="card mb-3 border-0 shadow-sm"
+              style={{ cursor: "pointer", borderRadius: "10px" }}
             >
               <div
-                className="card-text"
-                onClick={() => navigate(msg.data.onClickPath)}
+                className="card-body"
+                onClick={() => navigate(`${msg.data.onClickPath}`)}
               >
-                {msg.message}
+                <p className="card-text fs-5">{msg.message}</p>
               </div>
             </div>
           ))}

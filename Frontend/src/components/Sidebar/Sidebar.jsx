@@ -4,38 +4,52 @@ import "../../styles/SidebarStyles.css";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authSlice.js";
 import axios from "axios";
-import { adminMenu, userMenu, doctorMenu } from "./Data.js";
+import { adminMenu, userMenu } from "./Data.js";
 import { message } from "antd";
-// Navigation Items
 
 const Sidebar = () => {
+  const user = useSelector((state) => state.auth.userData);
+  const doctorMenu = [
+    {
+      name: "Home",
+      icon: "fa-solid fa-house",
+      slug: "/dashboard",
+    },
+    {
+      name: "Appointments",
+      icon: "fa-solid fa-list-check",
+      slug: "/doctor/appointments",
+    },
+
+    {
+      name: "Update Profile",
+      icon: "fa-regular fa-user",
+      slug: `/doctor/update-profile/${user?._id}`,
+    },
+  ];
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const handleLogout = async () => {
     try {
+      localStorage.clear("persist:root");
       await axios.post("/api/v1/users/logout");
       dispatch(logout()); // Clear user data in Redux
       navigate("/login"); // Redirect to login page
       message.success("logout Successfully");
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      navigate("/login");
     }
   };
-  const user = useSelector((state) => state.auth.userData);
-
-  console.log(user);
-
   const [isOpen, setIsOpen] = useState(true);
-  let navItems;
-  if (user.isAdmin) {
-    navItems = adminMenu;
-  } else if (user.isDoctor) {
-    navItems = doctorMenu;
-  } else {
-    navItems = userMenu;
-  }
-
-  console.log(navItems);
+  const navItems = user?.isAdmin
+    ? adminMenu
+    : user?.isDoctor
+    ? doctorMenu
+    : userMenu;
 
   // Function to handle toggle
   const toggleSidebar = () => {
@@ -78,8 +92,8 @@ const Sidebar = () => {
         {isOpen && (
           <div className="profile-details">
             <div className="name_job">
-              <div className="name">{user.name}</div>
-              <div className="job">{user.email}</div>
+              <div className="name">{user?.name}</div>
+              <div className="job">{user?.email}</div>
             </div>
           </div>
         )}

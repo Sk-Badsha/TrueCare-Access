@@ -46,7 +46,12 @@ function Register() {
           <Input type="password" required></Input>
         </Form.Item>
         <Flex justify="space-between" align="center">
-          <button className="btn btn-primary">Submit</button>
+          <button
+            className="btn btn-primary"
+            style={{ "margin-right": " 30px" }}
+          >
+            Submit
+          </button>
           <Link to="/login">Already Have an Account?</Link>
         </Flex>
       </Form>

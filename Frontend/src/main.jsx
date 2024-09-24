@@ -8,7 +8,15 @@ import {
   Dashboard,
   Notification,
 } from "./components/index.js";
-import { Register, Login, AddDoctor, Profile } from "./pages/index.js";
+import {
+  Register,
+  Login,
+  AddDoctor,
+  Profile,
+  BookingPage,
+  UserAppointments,
+  Appointments,
+} from "./pages/index.js";
 import Doctors, { doctorsLoader } from "./pages/Admin/Doctors.jsx";
 import Users, { usersLoader } from "./pages/Admin/Users.jsx";
 import Layout from "./Layout.jsx";
@@ -76,6 +84,14 @@ const router = createBrowserRouter(
           }
         />
         <Route
+          path="/doctor/book-appointment/:doctorId"
+          element={
+            <AuthInput authentication>
+              <BookingPage />
+            </AuthInput>
+          }
+        />
+        <Route
           path="/apply-doctor"
           element={
             <AuthInput authentication>
@@ -107,6 +123,24 @@ const router = createBrowserRouter(
           element={
             <AuthInput authentication>
               <Doctors />
+            </AuthInput>
+          }
+        />
+
+        <Route
+          path="/user/appointments"
+          element={
+            <AuthInput authentication>
+              <UserAppointments />
+            </AuthInput>
+          }
+        />
+
+        <Route
+          path="/doctor/appointments"
+          element={
+            <AuthInput authentication>
+              <Appointments />
             </AuthInput>
           }
         />

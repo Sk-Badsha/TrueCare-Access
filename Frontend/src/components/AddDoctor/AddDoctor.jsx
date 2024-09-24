@@ -4,6 +4,8 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { showLoading, hideLoading } from "../../redux/features/alertSlice.js";
+import moment from "moment";
+
 function AddDoctor() {
   const user = useSelector((state) => state.auth.userData);
   const dispatch = useDispatch();
@@ -14,13 +16,21 @@ function AddDoctor() {
       dispatch(showLoading());
       const res = await axios.post(
         "/api/v1/users/apply-doctor",
-        { ...values, userId: user._id },
+        {
+          ...values,
+          userId: user._id,
+          timings: {
+            start: values.timings[0].format("HH:mm"),
+            end: values.timings[1].format("HH:mm"),
+          },
+        },
         {
           withCredentials: true,
         }
       );
       dispatch(hideLoading());
-      console.log("On try block add doctor after network calling");
+      console.log(res.data);
+
       if (res.data.success) {
         console.log(res);
 
@@ -118,7 +128,7 @@ function AddDoctor() {
 
           <Col xs={24} md={24} lg={8}>
             <Form.Item label="Timing" name="timings" required>
-              <TimePicker.RangePicker format="HH:mm" needConfirm use12Hours />
+              <TimePicker.RangePicker format="HH:mm" />
             </Form.Item>
           </Col>
           <Col xs={24} md={24} lg={8}></Col>

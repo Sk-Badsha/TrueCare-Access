@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Checkbox, Form, Input } from "antd";
 import axios from "axios";
-import { Spinner } from "../index";
 import { useSelector } from "react-redux";
 
 function Home() {

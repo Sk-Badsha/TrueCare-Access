@@ -3,7 +3,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user_schema.js";
 import { Doctor } from "../models/doctor_schema.js";
-
+import { Appointment } from "../models/appointment_schema.js";
+import { convertDateTimeToISOString } from "../utils/ConvertDateTime.js";
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -97,13 +98,17 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const currentUser = req.user;
+  try {
+    const currentUser = req.user;
 
-  if (!currentUser) throw new ApiError(401, "no current user available");
+    if (!currentUser) throw new ApiError(401, "no current user available");
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "successfully got current user", currentUser));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "successfully got current user", currentUser));
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -164,7 +169,7 @@ const applyDoctor = asyncHandler(async (req, res) => {
     data: {
       doctorID: createdDoctor._id,
       name: createdDoctor.firstName + " " + createdDoctor.lastName,
-      onClickPath: "/doctors",
+      onClickPath: "/admin/doctors",
     },
   });
 
@@ -182,6 +187,26 @@ const applyDoctor = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(201, "Doctor Account Applied Successfully", createdDoctor)
     );
+});
+
+const getAllNotificationsByID = asyncHandler(async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userId).select(
+      "notification seenNotification"
+    );
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    // Return notifications
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Notifications fetched successfully", user));
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(505, "Error fetching notifications");
+  }
 });
 
 const getAllNotification = asyncHandler(async (req, res) => {
@@ -228,12 +253,175 @@ const deleteAllNotification = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllDoctors = asyncHandler(async (req, res) => {
+  try {
+    const doctors = await Doctor.find({ status: "approved" });
+    res
+      .status(201)
+      .json(
+        new ApiResponse(201, "All Doctor data fetched successfully", doctors)
+      );
+  } catch (error) {
+    console.log(error);
+    throw new ApiError(501, "Error while getting all doctors");
+  }
+});
+
+const bookAppointment = asyncHandler(async (req, res) => {
+  try {
+    const appointment = await Appointment.create({
+      ...req.body,
+      status: "pending",
+      time: convertDateTimeToISOString(req.body.date, req.body.time),
+    });
+    if (!appointment) {
+      throw new ApiError(500, "Error while booking appointment");
+    }
+
+    console.log("appointment: ", appointment);
+
+    const doctor = await User.findByIdAndUpdate(req.body.doctorInfo.userId, {
+      $push: {
+        notification: {
+          type: "new-appointment-request",
+          message: `A new appointment request from ${req.body.userInfo.name} at ${req.body.time} on ${req.body.date}`,
+          onClickPath: "/doctor/appointments",
+        },
+      },
+    });
+
+    const user = await User.findByIdAndUpdate(req.body.userId, {
+      $push: {
+        notification: {
+          type: "booking-for-doctor-appointment",
+          message: `Your request to book an appointment for Dr. ${req.body.doctorInfo?.firstName} ${req.body.doctorInfo?.lastName} at ${req.body.time} on ${req.body.date} has been send to your doctor`,
+          onClickPath: "/user/appointments",
+        },
+      },
+    });
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "Appointment request send successfully",
+          appointment
+        )
+      );
+  } catch (error) {
+    console.log(error);
+    throw new ApiError(502, "Error while booking appointment");
+  }
+});
+
+const bookingAvailability = asyncHandler(async (req, res) => {
+  try {
+    const userAppointmentStart = convertDateTimeToISOString(
+      req.body.date,
+      req.body.time
+    );
+
+    if (!userAppointmentStart) {
+      throw new ApiError(404, "Invalid user date or time");
+    }
+
+    const doctorTimings = await Doctor.findById(req.body.doctorId);
+
+    const doctorStartTime = convertDateTimeToISOString(
+      req.body.date,
+      doctorTimings.timings.start
+    );
+    const doctorEndTime = convertDateTimeToISOString(
+      req.body.date,
+      doctorTimings.timings.end
+    );
+
+    const appointmentDuration = 15 * 60 * 1000; // 15 minutes in milliseconds
+    const userAppointmentEnd = new Date(
+      userAppointmentStart.getTime() + appointmentDuration
+    );
+
+    const bufferTime = 5 * 60 * 1000; // 10 minutes
+
+    if (
+      userAppointmentStart < doctorStartTime ||
+      userAppointmentEnd > doctorEndTime
+    ) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            "Appointment time is outside of the doctor’s available hours",
+            false
+          )
+        );
+    }
+
+    // Check for conflicting appointments
+    const conflictingAppointments = await Appointment.find({
+      doctorId: req.body.doctorId,
+      date: req.body.date,
+      time: {
+        $gte: new Date(
+          userAppointmentStart.getTime() - bufferTime - appointmentDuration
+        ),
+        $lte: new Date(
+          userAppointmentEnd.getTime() + bufferTime + appointmentDuration
+        ),
+      },
+    });
+
+    if (conflictingAppointments.length > 0) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            "Appointment slot is already booked or too close to another appointment",
+            false
+          )
+        );
+    }
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Appointment slot is available", true));
+  } catch (error) {
+    console.log(error);
+    throw new ApiError(500, error.message, error);
+  }
+});
+
+const userAppointments = asyncHandler(async (req, res) => {
+  try {
+    const appointments = await Appointment.find({
+      userId: req.user._id,
+    })
+      .populate("doctorInfo", "firstName lastName specializationOn") // Select fields from Doctor model;
+      .populate("userInfo", "name email");
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, "Appointments gets successfully", appointments)
+      );
+  } catch (error) {
+    console.log(error);
+    throw new ApiError(502, "Error while getting all appointments");
+  }
+});
+
 export {
   registerUser,
   loginUser,
   getCurrentUser,
   logoutUser,
   applyDoctor,
+  getAllNotificationsByID,
   getAllNotification,
   deleteAllNotification,
+  getAllDoctors,
+  bookAppointment,
+  bookingAvailability,
+  userAppointments,
 };
