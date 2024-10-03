@@ -8,6 +8,8 @@ import Profile from "./Doctor/Profile.jsx";
 import BookingPage from "./BookingPage.jsx";
 import UserAppointments from "./UserAppointments.jsx";
 import Appointments from "./Doctor/Appointments.jsx";
+import UpdateProfile from "./UpdateProfile.jsx";
+import ChangePassword from "./ChangePassword.jsx";
 export {
   AddDoctor,
   HomePage,
@@ -19,4 +21,6 @@ export {
   BookingPage,
   UserAppointments,
   Appointments,
+  UpdateProfile,
+  ChangePassword,
 };

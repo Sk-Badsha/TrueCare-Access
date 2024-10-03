@@ -5,6 +5,12 @@ import { User } from "../models/user_schema.js";
 import { Doctor } from "../models/doctor_schema.js";
 import { Appointment } from "../models/appointment_schema.js";
 import { convertDateTimeToISOString } from "../utils/ConvertDateTime.js";
+import { sendEmail } from "../utils/SendEmail.js";
+import registrationSuccessEmail from "../utils/SendEmail/RegistrationSuccessEmail.js";
+import PrankEmail from "../utils/SendEmail/PrankEmail.js";
+import ResetPasswordEmail from "../utils/SendEmail/ResetPasswordEmail.js";
+import jwt from "jsonwebtoken";
+
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -51,7 +57,11 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering user");
   }
 
-  // Successful response
+  await sendEmail(
+    createdUser.email,
+    "Thank you for Registering with US 📧 TrueCare Access",
+    registrationSuccessEmail(createdUser.name)
+  );
   return res
     .status(201)
     .json(new ApiResponse(201, "User registered successfully", createdUser));
@@ -81,7 +91,9 @@ const loginUser = asyncHandler(async (req, res) => {
   );
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false,
+    sameSite: "Lax",
+    path: "/",
   };
 
   return res
@@ -95,6 +107,94 @@ const loginUser = asyncHandler(async (req, res) => {
         ref_token,
       })
     );
+});
+
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "User not exists");
+  }
+
+  const secret = process.env.JWT_SECRET + user.password;
+  const payload = {
+    email: user.email,
+    id: user._id,
+  };
+
+  const token = jwt.sign(payload, secret, { expiresIn: "300s" });
+
+  const link = `${process.env.FRONTEND_URL}/users/reset-password/${user._id}/${token}`;
+  try {
+    const result = await sendEmail(
+      email,
+      "Reset Password Request",
+      ResetPasswordEmail(user.name, link)
+    );
+    if (result) {
+      res
+        .status(200)
+        .json(new ApiResponse(200, "link sent successfully", link));
+    } else {
+      throw new ApiError(505, "error while sending email");
+    }
+  } catch (error) {
+    console.log(
+      "Error sending email:",
+      error.response ? error.response.body : error
+    );
+    throw new ApiError(
+      502,
+      "Email could not be sent, Please try after sometime"
+    );
+  }
+});
+
+const getResetPassword = asyncHandler(async (req, res) => {
+  const { id, token } = req.params;
+  const user = await User.findOne({ _id: req.params.id });
+
+  if (user) {
+    const secret = process.env.JWT_SECRET + user.password;
+    try {
+      const payload = jwt.verify(req.params.token, secret);
+      // render a form
+      res.status(200).json(new ApiResponse(200, "User & token is verified"));
+    } catch (error) {
+      console.log(error.message);
+      res.send(error.message);
+    }
+  } else {
+    res.send({ message: "hi" });
+    return;
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
+  console.log(token, " ", id, " ", password);
+
+  const user = await User.findOne({ _id: req.params.id });
+  if (!user) {
+    res.status(404).json(new ApiResponse(404, "User not valid"));
+  }
+  // we have a valid id & a valid user exist with this id
+  const secret = process.env.JWT_SECRET + user.password;
+  try {
+    const payload = jwt.verify(req.params.token, secret);
+    user.password = password;
+    await user.save({ validateBeforeSave: true });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "password updated successfully"));
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json(new ApiResponse(505, "DB Problem..Error in UPDATE with id"));
+  }
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -411,9 +511,52 @@ const userAppointments = asyncHandler(async (req, res) => {
   }
 });
 
+const updateProfile = asyncHandler(async (req, res) => {
+  try {
+    const requestedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      req.body
+    ).select("-password");
+
+    const updatedUser = await User.findById(requestedUser._id).select(
+      "-password"
+    );
+
+    res
+      .status(201)
+      .json(new ApiResponse(201, "User Updated Successfully", updatedUser));
+  } catch (error) {
+    console.log(error);
+    throw new ApiError(505, "Error while updating user info");
+  }
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { password, newPassword } = req.body;
+
+  if (!newPassword && !password)
+    throw new ApiError(400, "password or newPassword is required");
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if (!isPasswordValid) throw new ApiError(401, "Wrong Password");
+
+  user.password = newPassword;
+
+  user.notification.unshift({
+    type: "update-password",
+    message: "Your password has been updated successfully",
+    onClickPath: "/",
+  });
+  await user.save({ validateBeforeSave: true });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "password updated successfully", user));
+});
+
 export {
   registerUser,
   loginUser,
+  forgotPassword,
   getCurrentUser,
   logoutUser,
   applyDoctor,
@@ -424,4 +567,8 @@ export {
   bookAppointment,
   bookingAvailability,
   userAppointments,
+  updateProfile,
+  getResetPassword,
+  resetPassword,
+  changePassword,
 };

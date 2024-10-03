@@ -4,11 +4,13 @@ import "../../styles/SidebarStyles.css";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authSlice.js";
 import axios from "axios";
-import { adminMenu, userMenu } from "./Data.js";
+import { getUserMenu, getAdminMenu } from "./Data.js";
 import { message } from "antd";
 
 const Sidebar = () => {
   const user = useSelector((state) => state.auth.userData);
+  const userMenu = getUserMenu(user._id);
+  const adminMenu = getAdminMenu(user._id);
   const doctorMenu = [
     {
       name: "Home",
@@ -25,6 +27,11 @@ const Sidebar = () => {
       name: "Update Profile",
       icon: "fa-regular fa-user",
       slug: `/doctor/update-profile/${user?._id}`,
+    },
+    {
+      name: "Change password",
+      icon: "fa-solid fa-lock",
+      slug: `/user/change-password`,
     },
   ];
 
@@ -57,7 +64,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`sidebar ${isOpen ? "open" : ""}`}>
+    <div className={`sidebar position-sticky top-0 ${isOpen ? "open" : ""}`}>
       <div className="logo-details">
         <h5 className="logo_name">TRUECARE ACCESS</h5>
         <i

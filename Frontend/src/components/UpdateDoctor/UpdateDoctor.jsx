@@ -54,7 +54,6 @@ function UpdateDoctor() {
         }
       );
       dispatch(hideLoading());
-      console.log("On try block add doctor after network calling");
       if (res.data.success) {
         console.log(res);
 
@@ -65,11 +64,7 @@ function UpdateDoctor() {
       }
     } catch (error) {
       dispatch(hideLoading());
-      if (error.status === 404) {
-        message.error("User already applied for a Doctor Account");
-      } else {
-        message.error(error.message);
-      }
+      message.error(error.message);
     }
   };
 

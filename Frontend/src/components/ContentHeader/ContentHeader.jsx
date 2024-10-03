@@ -16,7 +16,7 @@ const ContentHeader = () => {
       >
         <i className="fa-solid fa-bell"></i>
       </Badge>
-      <Link to={`/doctor/update-profile/${user?._id}`}>
+      <Link to={`/user/update-profile/${user?._id}`}>
         {user && user.name?.toUpperCase()}
       </Link>
     </header>

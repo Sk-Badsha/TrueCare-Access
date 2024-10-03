@@ -69,26 +69,22 @@ function Doctors() {
   const data = useLoaderData();
 
   const handleChangeAccount = async (record, status) => {
-    try {
-      const res = await axios.post(
-        "/api/v1/admin/changeAccountStatus",
-        {
-          doctorId: record._id,
-          status: status,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (res.data.success) {
-        message.success(res.data.message);
-      } else {
-        message.error(res.data.message);
+    const res = await axios.post(
+      "/api/v1/admin/changeAccountStatus",
+      {
+        doctorId: record._id,
+        status: status,
+      },
+      {
+        withCredentials: true,
       }
-    } catch (error) {
-      message.error(error.message);
-      console.log(error);
+    );
+    console.log("res: ", res);
+
+    if (res.data.success) {
+      message.success(res.data.message);
+    } else {
+      message.error(res.response.data.message);
     }
   };
 

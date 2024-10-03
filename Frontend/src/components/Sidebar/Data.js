@@ -1,4 +1,5 @@
-const userMenu = [
+// menu.js
+export const getUserMenu = (userId) => [
   {
     name: "Home",
     icon: "fa-solid fa-house",
@@ -14,9 +15,19 @@ const userMenu = [
     icon: "fa-solid fa-user-doctor",
     slug: "/apply-doctor",
   },
+  {
+    name: "Update Profile",
+    icon: "fa-solid fa-user-tie",
+    slug: `/user/update-profile/${userId}`,
+  },
+  {
+    name: "Change password",
+    icon: "fa-solid fa-lock",
+    slug: `/user/change-password`,
+  },
 ];
 
-const adminMenu = [
+export const getAdminMenu = (userId) => [
   {
     name: "Home",
     icon: "fa-solid fa-house",
@@ -33,10 +44,13 @@ const adminMenu = [
     slug: "/admin/users",
   },
   {
-    name: "Profiles",
+    name: "Update Profile",
     icon: "fa-solid fa-user-tie",
-    slug: "/profiles",
+    slug: `/user/update-profile/${userId}`,
+  },
+  {
+    name: "Change password",
+    icon: "fa-solid fa-lock",
+    slug: `/user/change-password`,
   },
 ];
-
-export { adminMenu, userMenu };

@@ -7,6 +7,8 @@ import {
   AuthInput,
   Dashboard,
   Notification,
+  ForgotPassword,
+  ResetPassword,
 } from "./components/index.js";
 import {
   Register,
@@ -16,6 +18,8 @@ import {
   BookingPage,
   UserAppointments,
   Appointments,
+  UpdateProfile,
+  ChangePassword,
 } from "./pages/index.js";
 import Doctors, { doctorsLoader } from "./pages/Admin/Doctors.jsx";
 import Users, { usersLoader } from "./pages/Admin/Users.jsx";
@@ -68,9 +72,31 @@ const router = createBrowserRouter(
           }
         />
         <Route
+          path="/users/forgot-password"
+          element={
+            <AuthInput
+              authentication={false}
+              requiredRoles={["admin", "user", "doctor"]}
+            >
+              <ForgotPassword />
+            </AuthInput>
+          }
+        />
+        <Route
+          path="/users/reset-password/:id/:token"
+          element={
+            <AuthInput authentication={false}>
+              <ResetPassword />
+            </AuthInput>
+          }
+        />
+        <Route
           path="dashboard"
           element={
-            <AuthInput authentication>
+            <AuthInput
+              authentication
+              requiredRoles={["admin", "user", "doctor"]}
+            >
               <Dashboard />
             </AuthInput>
           }
@@ -78,7 +104,7 @@ const router = createBrowserRouter(
         <Route
           path="/doctor/update-profile/:id"
           element={
-            <AuthInput authentication>
+            <AuthInput authentication requiredRoles={["doctor"]}>
               <Profile />
             </AuthInput>
           }
@@ -86,7 +112,10 @@ const router = createBrowserRouter(
         <Route
           path="/doctor/book-appointment/:doctorId"
           element={
-            <AuthInput authentication>
+            <AuthInput
+              authentication
+              requiredRoles={["doctor", "user", "admin"]}
+            >
               <BookingPage />
             </AuthInput>
           }
@@ -103,7 +132,10 @@ const router = createBrowserRouter(
         <Route
           path="/notification"
           element={
-            <AuthInput authentication>
+            <AuthInput
+              authentication
+              requiredRoles={["admin", "user", "doctor"]}
+            >
               <Notification />
             </AuthInput>
           }
@@ -112,7 +144,7 @@ const router = createBrowserRouter(
           loader={usersLoader}
           path="/admin/users"
           element={
-            <AuthInput authentication>
+            <AuthInput authentication requiredRoles={["admin"]}>
               <Users />
             </AuthInput>
           }
@@ -121,7 +153,7 @@ const router = createBrowserRouter(
           loader={doctorsLoader}
           path="/admin/doctors"
           element={
-            <AuthInput authentication>
+            <AuthInput authentication requiredRoles={["admin"]}>
               <Doctors />
             </AuthInput>
           }
@@ -139,8 +171,27 @@ const router = createBrowserRouter(
         <Route
           path="/doctor/appointments"
           element={
-            <AuthInput authentication>
+            <AuthInput authentication requiredRoles={["doctor"]}>
               <Appointments />
+            </AuthInput>
+          }
+        />
+        <Route
+          path="/user/update-profile/:id"
+          element={
+            <AuthInput authentication requiredRoles={["admin", "user"]}>
+              <UpdateProfile />
+            </AuthInput>
+          }
+        />
+        <Route
+          path="/user/change-password"
+          element={
+            <AuthInput
+              authentication
+              requiredRoles={["admin", "user", "doctor"]}
+            >
+              <ChangePassword />
             </AuthInput>
           }
         />

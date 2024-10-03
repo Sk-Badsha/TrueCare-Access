@@ -14,6 +14,8 @@ import Dashboard from "./Dashboard/Dashboard.jsx";
 import UpdateDoctor from "./UpdateDoctor/UpdateDoctor.jsx";
 import AddDoctor from "./AddDoctor/AddDoctor.jsx";
 import Appointments from "./Appointments/Appointments.jsx";
+import ForgotPassword from "./ForgotPassword/ForgotPassword.jsx";
+import ResetPassword from "./ResetPassword/ResetPassword.jsx";
 export {
   Header,
   Home,
@@ -31,4 +33,6 @@ export {
   AddDoctor,
   Notification,
   Appointments,
+  ForgotPassword,
+  ResetPassword,
 };

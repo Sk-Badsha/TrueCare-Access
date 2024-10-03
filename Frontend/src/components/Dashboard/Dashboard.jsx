@@ -19,8 +19,6 @@ function Dashboard() {
       if (res.data.success) {
         dispatch(hideLoading());
         setDoctors(res.data?.data);
-        message.success(res.data.message);
-        console.log(res.data.data);
       }
     } catch (error) {
       dispatch(hideLoading());

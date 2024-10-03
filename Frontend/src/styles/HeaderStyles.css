@@ -1,0 +1,10 @@
+nav {
+    background-color: #d46e0f;
+    background-color: yellow;
+
+}
+
+nav .nav-link {
+    color: #000080;
+    font-size: 17px;
+}

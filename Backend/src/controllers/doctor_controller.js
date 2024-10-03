@@ -77,17 +77,24 @@ const doctorAppointments = asyncHandler(async (req, res) => {
 const changeBookingStatus = asyncHandler(async (req, res) => {
   try {
     const { appointmentId, status } = req.body;
-    const appointment = await Appointment.findByIdAndUpdate(appointmentId, {
-      status,
-    }).select("-password");
+    const appointment = await Appointment.findByIdAndUpdate(
+      appointmentId,
+      {
+        status,
+      },
+      { new: true }
+    )
+      .populate("doctorInfo", "lastName")
+      .select("-password");
 
     const user = await User.findById(appointment.userId);
     const notification = user.notification;
+
     notification.push({
       type: `doctor-appointment-request`,
-      message: `Your appointment request for Dr.${appointment.doctorInfo.lastName} on ${appointment.date} at ${appointment.time} has been ${status}`,
+      message: `Your appointment request for Dr.${appointment?.doctorInfo?.lastName} on ${appointment.time} has been ${status}`,
       data: {
-        onClickPath: "/notifications",
+        onClickPath: "/user/appointments",
       },
     });
     await User.findByIdAndUpdate(user._id, {

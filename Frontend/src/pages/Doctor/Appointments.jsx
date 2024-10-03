@@ -4,7 +4,7 @@ import { message, Table } from "antd";
 import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
 import dayjs from "dayjs";
 function Appointments() {
@@ -24,6 +24,8 @@ function Appointments() {
       );
 
       if (res.data.success) {
+        console.log(appointments);
+
         message.success(res.data.message);
       } else {
         message.error(res.data.message);
@@ -41,8 +43,9 @@ function Appointments() {
 
     {
       title: "Patient Name",
-      dataIndex: "DoctorName",
-      render: (text, record) => ` ${record.userInfo.name}`,
+      dataIndex: "patientName",
+      render: (text, record) => ` 
+      ${record.userInfo.name}`,
     },
     {
       title: "Date",
@@ -99,8 +102,8 @@ function Appointments() {
   }, []);
   return (
     <Container>
-      <h3 className="text-center">Doctor Appointments List: </h3>
       {console.log(appointments)}
+      <h3 className="text-center">Doctor Appointments List: </h3>
       <Table columns={columns} dataSource={appointments} />
     </Container>
   );

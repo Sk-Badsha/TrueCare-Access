@@ -106,7 +106,7 @@ function BookingPage() {
   return (
     <Container>
       <h3 className="text-center">Booking Page: </h3>
-      <div className="container">
+      <div className="container m-2">
         {doctor && (
           <>
             <h3>

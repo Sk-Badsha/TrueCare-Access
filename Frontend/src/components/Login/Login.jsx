@@ -55,11 +55,18 @@ const App = () => {
         >
           <Input type="password" required />
         </Form.Item>
-        <Flex justify="space-between" align="center">
-          <button className="btn btn-success" type="submit">
+        <Form.Item>
+          <button
+            style={{ width: "100%" }}
+            className="btn btn-success"
+            type="submit"
+          >
             Login
           </button>
+        </Form.Item>
+        <Flex justify="space-between" align="center">
           <Link to="/register">Register Now!</Link>
+          <Link to="/users/forgot-password">Forgot Password?</Link>
         </Flex>
       </Form>
     </div>

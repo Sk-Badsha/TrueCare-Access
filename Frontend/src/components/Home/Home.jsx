@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-
+import { Container } from "../index.js";
 function Home() {
   const [user, setUser] = useState("");
   const temp = useSelector((state) => state.auth?.userData?.name);
@@ -25,10 +25,10 @@ function Home() {
   }, []);
 
   return (
-    <>
+    <Container>
       <h1>True Care Access</h1>
       {temp && <p>Welcome {temp}</p>}
-    </>
+    </Container>
   );
 }
 
