@@ -22,6 +22,7 @@ import {
   ChangePassword,
 } from "./pages/index.js";
 import Doctors, { doctorsLoader } from "./pages/Admin/Doctors.jsx";
+import JobOpen from "./pages/Temp/JobOpen.jsx";
 import Users, { usersLoader } from "./pages/Admin/Users.jsx";
 import Layout from "./Layout.jsx";
 import store, { persistor } from "./redux/store.js";
@@ -192,6 +193,14 @@ const router = createBrowserRouter(
               requiredRoles={["admin", "user", "doctor"]}
             >
               <ChangePassword />
+            </AuthInput>
+          }
+        />
+        <Route
+          path="/job-opening"
+          element={
+            <AuthInput authentication={false}>
+              <JobOpen />
             </AuthInput>
           }
         />

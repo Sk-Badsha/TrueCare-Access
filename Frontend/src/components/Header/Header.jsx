@@ -31,7 +31,7 @@ function Header() {
                 <li className="nav-item" key={item.slug}>
                   <NavLink
                     className={({ isActive }) =>
-                      ` nav-link ${isActive ? "active" : ""}`
+                      ` nav-link ${isActive ? "active header-active" : ""}`
                     }
                     aria-current="page"
                     to={item.slug}

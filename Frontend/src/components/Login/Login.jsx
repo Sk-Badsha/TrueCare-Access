@@ -19,7 +19,7 @@ const App = () => {
       if (res.data.success) {
         message.success(res.data.message || "Login successful!");
         dispatch(authLogin(res.data.data.user));
-        navigate("/");
+        navigate("/dashboard");
       } else {
         throw new Error(res.data.message || "Login failed");
       }

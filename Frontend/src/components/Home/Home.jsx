@@ -26,8 +26,12 @@ function Home() {
 
   return (
     <Container>
-      <h1>True Care Access</h1>
-      {temp && <p>Welcome {temp}</p>}
+      <div className="home-box">
+        <div className="home-content">
+          <h1>True Care Access</h1>
+          <h4>{temp && `Welcome ${temp}`}</h4>
+        </div>
+      </div>
     </Container>
   );
 }
