@@ -48,7 +48,14 @@ function UpdateDoctor() {
       dispatch(showLoading());
       const res = await axios.post(
         "/api/v1/doctor/updateDoctorInfo",
-        { ...values, userId: user._id },
+        {
+          ...values,
+          timings: {
+            start: values.timings[0].format("HH:mm"),
+            end: values.timings[1].format("HH:mm"),
+          },
+          userId: user._id,
+        },
         {
           withCredentials: true,
         }

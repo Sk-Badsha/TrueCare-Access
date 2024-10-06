@@ -23,8 +23,10 @@ const updateDoctorInfo = asyncHandler(async (req, res) => {
   try {
     const updatedDoctor = await Doctor.findOneAndUpdate(
       { userId: req.body.userId },
-      req.body
+      req.body,
+      { new: true }
     ).select("-password");
+    console.log(updatedDoctor);
 
     res
       .status(201)

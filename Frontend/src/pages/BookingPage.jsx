@@ -40,6 +40,10 @@ function BookingPage() {
 
   // handle booking
   const handleBooking = async () => {
+    if (date < Date.now()) {
+      message.error("Invalid Date");
+      return;
+    }
     try {
       dispatch(showLoading());
       const res = await axios.post(
@@ -75,6 +79,16 @@ function BookingPage() {
     try {
       if (!date || !time) {
         return alert("Date & Time is required");
+      }
+      const selectedDate = dayjs(date, "DD-MM-YYYY");
+      const currentDate = dayjs();
+      if (selectedDate.isBefore(currentDate, "day")) {
+        message.error(
+          `Invalid Date Please select a date on or after ${dayjs().format(
+            "DD-MM-YYYY"
+          )}`
+        );
+        return;
       }
       dispatch(showLoading());
       const res = await axios.post(
