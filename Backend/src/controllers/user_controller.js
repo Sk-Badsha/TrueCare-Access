@@ -8,6 +8,7 @@ import { convertDateTimeToISOString } from "../utils/ConvertDateTime.js";
 import { sendEmail } from "../utils/SendEmail.js";
 import ResetPasswordEmail from "../utils/SendEmail/ResetPasswordEmail.js";
 import jwt from "jsonwebtoken";
+import generateOtp from "../utils/generateOtp.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -42,27 +43,54 @@ const registerUser = asyncHandler(async (req, res) => {
       .json(new ApiResponse(409, "User with this email already exists", {}));
   }
 
+  const { otp, otpExpires } = generateOtp(6);
+
   const user = await User.create({
     name,
     email: email.toLowerCase(),
     password,
+    otp,
+    otpExpires,
   });
 
   // Select fields to return (excluding sensitive data)
-  const createdUser = await User.findById(user._id).select("-password");
+  const createdUser = await User.findById(user._id).select(
+    "-password -otp -otpExpires"
+  );
 
   if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering user");
   }
-
-  await sendEmail(
-    createdUser.email,
-    "Thank you for Registering with US 📧 TrueCare Access",
-    registrationSuccessEmail(createdUser.name)
-  );
+  console.log(otp);
+  //   await sendEmail(
+  //     createdUser.email,
+  //     "Thank you for Registering with US 📧 TrueCare Access",
+  //     registrationSuccessEmail(createdUser.name)
+  //   );
   return res
     .status(201)
-    .json(new ApiResponse(201, "User registered successfully", createdUser));
+    .json(new ApiResponse(201, "Otp sent to your email", createdUser));
+});
+
+const verifyAccount = asyncHandler(async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) throw new ApiError(404, "User not found");
+    if (!user.verifyOtp(otp)) {
+      throw new ApiError(400, "Invalid OTP");
+    }
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpires = null;
+    await user.save();
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Account verified successfully"));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -75,6 +103,8 @@ const loginUser = asyncHandler(async (req, res) => {
   });
 
   if (!user) throw new ApiError(404, "User doesn't exists");
+
+  if (!user.isVerified) throw new ApiError(403, "Please Verify Before login");
 
   const isPasswordValid = await user.isPasswordCorrect(password);
 
@@ -192,6 +222,34 @@ const resetPassword = asyncHandler(async (req, res) => {
     return res
       .status(500)
       .json(new ApiResponse(505, "DB Problem..Error in UPDATE with id"));
+  }
+});
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const acc_token = user.generateAccessToken();
+    const loggedInUser = await User.findById(user._id).select(
+      "-password -refreshToken"
+    );
+    const options = {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Lax",
+      path: "/",
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", acc_token, options)
+      .json(
+        new ApiResponse(200, "access token generated successfully", {
+          user: loggedInUser,
+          acc_token,
+        })
+      );
+  } catch (error) {
+    throw new ApiError(404, "Error while generating access token");
   }
 });
 
@@ -553,6 +611,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
 export {
   registerUser,
+  verifyAccount,
   loginUser,
   forgotPassword,
   getCurrentUser,
@@ -569,4 +628,5 @@ export {
   getResetPassword,
   resetPassword,
   changePassword,
+  refreshAccessToken,
 };

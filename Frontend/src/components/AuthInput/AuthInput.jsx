@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
-import { persistor } from "../../redux/store.js";
 import Cookies from "js-cookie";
 import { message } from "antd";
 import { logout } from "../../redux/features/authSlice.js";
@@ -14,15 +13,14 @@ export default function AuthInput({
 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const authStatus = useSelector((state) => state.auth.status);
   const user = useSelector((state) => state.auth.userData);
 
   useEffect(() => {
     // Show loading spinner
-    const accessToken = Cookies.get("accessToken");
-    console.log(Cookies.get("refreshToken"));
-
-    console.log("accessToken found as : ", accessToken);
+    console.log("Cookies: " + document.cookie);
+    const accessToken = document.cookie.includes("accessToken");
     console.log("auth status: ", authStatus);
     console.log("authentication: ", authentication);
 
@@ -30,15 +28,12 @@ export default function AuthInput({
 
     // IIFE for handling authentication checks
     (async () => {
-      if (authentication && !authStatus && !accessToken) {
-        Cookies.remove("accessToken", { path: "/" });
-        Cookies.remove("refreshToken", { path: "/" });
+      if (authentication && !authStatus) {
         dispatch(logout());
-        await persistor.purge();
         console.log("inside if");
         navigate("/login");
       } else if (!authentication && authStatus) {
-        navigate("/");
+        navigate("/dashboard");
       } else if (authentication && authStatus) {
         const hasPermission = requiredRoles.some((role) =>
           role === "admin"
@@ -57,7 +52,7 @@ export default function AuthInput({
       // Hide loading spinner
       dispatch(hideLoading());
     })(); // Immediately invoke the async function
-  }, [authStatus, authentication, navigate, dispatch]);
+  }, [authStatus, authentication, user, navigate, dispatch]);
 
   return <>{children}</>;
 }

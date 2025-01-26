@@ -36,6 +36,16 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otp: {
+      type: String, // Store OTP as plain text or hashed (recommended for production)
+    },
+    otpExpires: {
+      type: Date, // Store OTP expiration time
+    },
   },
   { timestamps: true }
 );
@@ -74,6 +84,11 @@ userSchema.methods.generateRefreshToken = function () {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
   );
+};
+// Verify OTP
+userSchema.methods.verifyOtp = function (inputOtp) {
+  const isOtpValid = this.otp === inputOtp && this.otpExpires > new Date();
+  return isOtpValid;
 };
 
 export const User = mongoose.model("User", userSchema);

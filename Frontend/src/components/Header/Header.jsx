@@ -45,11 +45,11 @@ function Header() {
   }, []);
   return (
     <nav className={`${isSticky ? "sticky" : ""}`}>
-      <div class="nav-content">
-        <div class="logo">
+      <div className="nav-content">
+        <div className="logo">
           <a href="#">TrueCare Access</a>
         </div>
-        <ul class="nav-links">
+        <ul className="nav-links">
           {navItems.map((item) =>
             item.active ? (
               <li className="nav-item" key={item.slug}>

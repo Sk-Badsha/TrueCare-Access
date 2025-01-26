@@ -38,8 +38,6 @@ function UpdateDoctor() {
       }
     } catch (error) {
       console.log(error);
-
-      message.error(error.message);
     }
   };
 
@@ -62,8 +60,6 @@ function UpdateDoctor() {
       );
       dispatch(hideLoading());
       if (res.data.success) {
-        console.log(res);
-
         message.success(res.data.message);
         navigate("/dashboard");
       } else {

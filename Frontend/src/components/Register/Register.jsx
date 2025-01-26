@@ -1,61 +1,69 @@
 import React from "react";
-import { Flex, Form, Input, message } from "antd";
+import { Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../../redux/features/alertSlice";
+import "../../styles/register.css"; // Assuming we're using a new style for Register
+
 function Register() {
-  // form handler
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const onfinishHandler = async (values) => {
+
+  const onFinishHandler = async (values) => {
     try {
       dispatch(showLoading());
       const res = await axios.post("/api/v1/users/register", values);
-      console.log(res);
 
       if (res.status >= 200 && res.status < 300) {
         dispatch(hideLoading());
-        message.success(res.data.message); // Show success message if user is registered
-        navigate("/login");
+        message.success(res.data.message);
+        navigate("/verifyAccount", { state: { email: values.email } });
       } else {
         dispatch(hideLoading());
-        message.error(res.data.message); // Show error message for 409 (user already exists)
+        message.error(res.data.message);
       }
     } catch (error) {
       dispatch(hideLoading());
       if (error.response && error.response.data.message) {
-        message.error(error.response.data.message); // Display API error message if available
+        message.error(error.response.data.message);
       } else {
-        message.error("Something went wrong!"); // Fallback error message
+        message.error("Something went wrong!");
       }
     }
   };
 
   return (
-    <div className="form-container">
-      <Form layout="vertical" onFinish={onfinishHandler} className="form-main">
-        <h3 className="text-center">Register Now</h3>
-        <Form.Item label="Name" name="name">
-          <Input type="text" required></Input>
+    <div className="register-container">
+      <Form
+        layout="vertical"
+        onFinish={onFinishHandler}
+        className="register-form"
+      >
+        <h3 className="register-form-title">Register Now</h3>
+        <Form.Item label="Name" name="name" className="register-form-item">
+          <Input type="text" required className="register-input" />
         </Form.Item>
-        <Form.Item label="Email" name="email">
-          <Input type="email" required></Input>
+        <Form.Item label="Email" name="email" className="register-form-item">
+          <Input type="email" required className="register-input" />
         </Form.Item>
-        <Form.Item label="Password" name="password">
-          <Input type="password" required></Input>
+        <Form.Item
+          label="Password"
+          name="password"
+          className="register-form-item"
+        >
+          <Input type="password" required className="register-input" />
         </Form.Item>
-        <Flex justify="space-between" align="center">
-          <button
-            className="btn btn-primary"
-            style={{ "margin-right": " 30px" }}
-          >
-            Submit
-          </button>
-          <Link to="/login">Already Have an Account?</Link>
-        </Flex>
+
+        <div className="register-footer">
+          <button className="register-btn-submit">Submit</button>
+          <Link to="/login" className="register-login-link">
+            Already Have an Account?
+          </Link>
+        </div>
       </Form>
     </div>
   );
 }
+
 export default Register;

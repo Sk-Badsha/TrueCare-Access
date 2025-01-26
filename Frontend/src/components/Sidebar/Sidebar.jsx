@@ -40,9 +40,9 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
-      localStorage.clear("persist:root");
       await axios.post("/api/v1/users/logout");
       dispatch(logout()); // Clear user data in Redux
+      localStorage.removeItem("accessToken");
       navigate("/login"); // Redirect to login page
       message.success("logout Successfully");
     } catch (error) {

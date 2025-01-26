@@ -1,17 +1,61 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from "../../components/index.js";
 import { message, Table } from "antd";
-import { useLoaderData } from "react-router-dom";
-
 import axios from "axios";
+
 function Doctors() {
+  const [doctors, setDoctors] = useState([]); // Store all doctor data
+  const [loading, setLoading] = useState(false); // Loading state for Table
+  const [pagination, setPagination] = useState({
+    current: 1, // Current page
+    pageSize: 5, // Page size (number of rows per page)
+    total: 0, // Total number of doctors
+  });
+
+  // Fetch all doctors data from backend
+  const fetchDoctors = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`/api/v1/admin/getAllDoctors`, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        // Store all doctor data in state
+        setDoctors(res.data.data);
+        setPagination({
+          ...pagination,
+          total: res.data.data.length, // Total doctors count
+        });
+      } else {
+        message.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      message.error("Failed to load doctors");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchDoctors(); // Fetch all doctors on component mount
+  }, []);
+
+  // Handle table pagination change
+  const handleTableChange = (pagination) => {
+    setPagination({
+      ...pagination,
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+    });
+  };
+
   const columns = [
     {
       title: "Name",
-      dataIndex: `Name`,
+      dataIndex: "Name",
       render: (text, record) => `${record.firstName} ${record.lastName}`,
     },
-
     {
       title: "Email",
       dataIndex: "email",
@@ -23,17 +67,17 @@ function Doctors() {
       key: "specializationOn",
     },
     {
-      title: "status",
+      title: "Status",
       dataIndex: "status",
       key: "status",
     },
     {
-      title: "phone",
+      title: "Phone",
       dataIndex: "phone",
       key: "phone",
     },
     {
-      title: "created at",
+      title: "Created At",
       dataIndex: "createdAt",
       key: "createdAt",
       render: (text, record) => {
@@ -66,8 +110,6 @@ function Doctors() {
     },
   ];
 
-  const data = useLoaderData();
-
   const handleChangeAccount = async (record, status) => {
     const res = await axios.post(
       "/api/v1/admin/changeAccountStatus",
@@ -79,18 +121,36 @@ function Doctors() {
         withCredentials: true,
       }
     );
-    console.log("res: ", res);
 
     if (res.data.success) {
       message.success(res.data.message);
+      fetchDoctors(); // Refresh data after status change
     } else {
       message.error(res.response.data.message);
     }
   };
 
+  // Paginated data for current page
+  const paginatedData = doctors.slice(
+    (pagination.current - 1) * pagination.pageSize,
+    pagination.current * pagination.pageSize
+  );
+
   return (
     <Container>
-      <Table columns={columns} dataSource={data} />
+      <Table
+        columns={columns}
+        dataSource={paginatedData} // Only show the current page's data
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          showTotal: (total) => `Total ${total} doctors`,
+        }}
+        loading={loading}
+        onChange={handleTableChange} // Handle pagination changes
+        rowKey={(record) => record._id} // Unique key for each row
+      />
     </Container>
   );
 }

@@ -1,10 +1,12 @@
 import { Router } from "express";
 import {
   registerUser,
+  verifyAccount,
   loginUser,
   forgotPassword,
   getCurrentUser,
   logoutUser,
+  refreshAccessToken,
   applyDoctor,
   getAllNotificationsByID,
   getAllNotification,
@@ -23,12 +25,14 @@ import { authorizeRoles } from "../middlewares/authorizeRoles.js";
 const router = Router();
 
 router.route("/register").post(registerUser);
+router.route("/verifyAccount").post(verifyAccount);
 router.route("/login").post(loginUser);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password/:id/:token").get(getResetPassword);
 router.route("/reset-password/:id/:token").post(resetPassword);
 
 // secure route
+router.route("/refreshAccessToken").get(verifyJWT, refreshAccessToken);
 router.route("/getCurrentUser").get(verifyJWT, getCurrentUser);
 router.route("/logout").post(verifyJWT, logoutUser);
 router
