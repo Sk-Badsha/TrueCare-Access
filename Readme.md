@@ -54,4 +54,4 @@ Contributions are welcome! If you have suggestions, bug reports, or want to cont
 
 ## Contact
 
-For questions or support, please contact [badshabhota@gmail.com](mailto: badshabhota@gmail.com).
+For questions or support, please contact [badshabhota@gmail.com](mailto:badshabhota@gmail.com)
