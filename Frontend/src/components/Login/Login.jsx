@@ -20,7 +20,7 @@ const App = () => {
       if (res.data.success) {
         message.success(res.data.message || "Login successful!");
         dispatch(authLogin(res.data.data.user));
-        console.log(res?.data?.data);
+
         localStorage.setItem("accessToken", res?.data?.data.acc_token);
         navigate("/dashboard");
       } else {

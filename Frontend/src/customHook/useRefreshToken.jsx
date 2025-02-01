@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/features/authSlice";
-
+import { logout } from "../redux/features/authSlice";
 const useRefreshToken = () => {
   const dispatch = useDispatch();
   const refresh = async () => {

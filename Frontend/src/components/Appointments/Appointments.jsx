@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 function Appointments() {
   const dispatch = useDispatch();
   const [appointments, setAppointments] = useState();
+  console.log(appointments);
 
   const columns = [
     {
@@ -20,7 +21,7 @@ function Appointments() {
       title: "Doctor Name",
       dataIndex: "DoctorName",
       render: (text, record) =>
-        ` ${record.doctorInfo.firstName} ${record.doctorInfo.lastName} `,
+        ` ${record?.doctorInfo?.firstName} ${record?.doctorInfo?.lastName} `,
     },
     {
       title: "Date",
@@ -46,7 +47,7 @@ function Appointments() {
         withCredentials: true,
       });
       dispatch(hideLoading());
-      setAppointments(res.data.data);
+      setAppointments(res?.data?.data);
     } catch (error) {
       dispatch(hideLoading());
       console.log(error);

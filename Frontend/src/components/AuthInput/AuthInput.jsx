@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
-import Cookies from "js-cookie";
 import { message } from "antd";
 import { logout } from "../../redux/features/authSlice.js";
 
@@ -19,10 +18,8 @@ export default function AuthInput({
 
   useEffect(() => {
     // Show loading spinner
-    console.log("Cookies: " + document.cookie);
+
     const accessToken = document.cookie.includes("accessToken");
-    console.log("auth status: ", authStatus);
-    console.log("authentication: ", authentication);
 
     dispatch(showLoading());
 
@@ -30,7 +27,7 @@ export default function AuthInput({
     (async () => {
       if (authentication && !authStatus) {
         dispatch(logout());
-        console.log("inside if");
+
         navigate("/login");
       } else if (!authentication && authStatus) {
         navigate("/dashboard");
