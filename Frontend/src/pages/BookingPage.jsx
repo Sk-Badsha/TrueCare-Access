@@ -1,27 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Container } from "../components/index.js";
+import { Card, Row, Col, Typography, message } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import { message, DatePicker, TimePicker } from "antd";
+import { useSelector } from "react-redux";
 import axios from "axios";
-import dayjs from "dayjs";
-import { useDispatch, useSelector } from "react-redux";
-import { hideLoading, showLoading } from "../redux/features/alertSlice.js";
+import DoctorDetails from "./Doctor/DoctorDetails.jsx";
+import BookingForm from "./BookingForm.jsx";
+import { Container } from "../components/index.js";
+
+const { Title, Text } = Typography;
 
 function BookingPage() {
-  const backendUrl = import.meta.env.VITE_BACKEND_ENDPOINT;
-  const dispatch = useDispatch();
+  const [doctor, setDoctor] = useState({});
   const params = useParams();
   const navigate = useNavigate();
-  const [doctor, setDoctor] = useState({});
-  const [date, setDate] = useState();
-  const [time, setTime] = useState();
-  const [isAvailable, setIsAvailable] = useState(false);
   const user = useSelector((state) => state.auth.userData);
+
   const getDoctorDetails = async () => {
     try {
       if (params?.doctorId === user?._id) {
         throw new Error(
-          "You are again cheating 😂. You can't book you own appointment😂😂"
+          "You are again cheating 😂. You can't book your own appointment😂😂"
         );
       }
       const res = await axios.post(
@@ -35,6 +33,9 @@ function BookingPage() {
       );
       if (res.data?.success) {
         setDoctor(res.data.data);
+        message.success("Doctor details loaded successfully!");
+      } else {
+        message.error("Failed to load doctor details.");
       }
     } catch (error) {
       console.log(error);
@@ -42,135 +43,59 @@ function BookingPage() {
       navigate("/dashboard");
     }
   };
+
   useEffect(() => {
     getDoctorDetails();
   }, []);
 
-  // handle booking
-  const handleBooking = async () => {
-    if (date < Date.now()) {
-      message.error("Invalid Date");
-      return;
-    }
-    try {
-      dispatch(showLoading());
-      const res = await axios.post(
-        "/api/v1/users/book-appointment",
-        {
-          doctorId: params.doctorId,
-          userId: user._id,
-          doctorInfo: doctor,
-          date: date,
-          userInfo: user,
-          time: time,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-      dispatch(hideLoading());
-      setIsAvailable(false);
-      console.log(res.data?.data);
-
-      if (res.data?.success) {
-        message.success(res.data?.message);
-      } else {
-        message.error(res.data?.message);
-      }
-    } catch (error) {
-      dispatch(hideLoading());
-      console.log(error);
-    }
-  };
-
-  const handleBookingAvailability = async () => {
-    try {
-      if (!date || !time) {
-        return alert("Date & Time is required");
-      }
-      const selectedDate = dayjs(date, "DD-MM-YYYY");
-      const currentDate = dayjs();
-      if (selectedDate.isBefore(currentDate, "day")) {
-        message.error(
-          `Invalid Date Please select a date on or after ${dayjs().format(
-            "DD-MM-YYYY"
-          )}`
-        );
-        return;
-      }
-      dispatch(showLoading());
-      const res = await axios.post(
-        "/api/v1/users/booking-availability",
-        {
-          doctorId: params.doctorId,
-          date: date,
-          time: time,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-      dispatch(hideLoading());
-
-      if (res.data.data === true) {
-        setIsAvailable(true);
-        message.success(res.data.message);
-      } else {
-        setIsAvailable(false);
-        message.error(res.data?.message);
-      }
-    } catch (error) {
-      console.log(error);
-      message.error(error);
-    }
+  const handleBookingSuccess = () => {
+    message.success("Appointment booked successfully!");
+    navigate("/appointments"); // Redirect after successful booking
   };
 
   return (
-    <Container>
-      <h3 className="text-center">Booking Page: </h3>
-      <div className="container m-2">
-        {doctor && (
-          <>
-            <h3>
-              Dr. {doctor.firstName} {doctor.lastName}
-            </h3>
-            <h4>Fees: {doctor.feesPerConsultation}</h4>
-            <h4>
-              Timings: {doctor.timings?.start} - {doctor.timings?.end}
-            </h4>
-            <div className="d-flex flex-column w-25">
-              <DatePicker
-                className="my-2"
-                format="DD-MM-YYYY"
-                onChange={(value) => {
-                  setDate(value.format("DD-MM-YYYY"));
-                  setIsAvailable(false);
-                }}
-              />
-              <TimePicker
-                className="my-1"
-                format="HH:mm"
-                required
-                onChange={(value) => {
-                  setTime(value ? value.format("HH:mm") : null);
-                  setIsAvailable(false);
-                }}
-              />
-              <button
-                className="btn btn-primary mt-2"
-                onClick={handleBookingAvailability}
-              >
-                Check Availability
-              </button>
-              {isAvailable && (
-                <button className="btn btn-dark mt-2" onClick={handleBooking}>
-                  Book Now
-                </button>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+    <Container
+      style={{ background: "#E0FFFF", minHeight: "100vh", padding: "20px" }}
+    >
+      <Row justify="center">
+        <Col xs={24} sm={20} md={16} lg={12}>
+          <Card
+            className="booking-card"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              background: "#FFFFFF",
+            }}
+          >
+            <Title
+              level={3}
+              className="text-center"
+              style={{ color: "#008080" }}
+            >
+              🗓️ Book an Appointment
+            </Title>
+            <Text
+              type="secondary"
+              className="text-center"
+              style={{
+                display: "block",
+                marginBottom: "20px",
+                color: "#333333",
+              }}
+            >
+              Please select a date and time to book your appointment with the
+              doctor.
+            </Text>
+            <DoctorDetails doctor={doctor} />
+            <BookingForm
+              doctorId={params.doctorId}
+              user={user}
+              doctor={doctor}
+              onBookingSuccess={handleBookingSuccess}
+            />
+          </Card>
+        </Col>
+      </Row>
     </Container>
   );
 }

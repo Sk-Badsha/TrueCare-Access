@@ -167,85 +167,77 @@ ul {
     color: black;
 }
 
-.sidebar li.profile {
+.sidebar .profile {
     position: fixed;
-    height: 60px;
-    width: 80px;
+    bottom: 0;
     left: 0;
-    bottom: -8px;
-    padding: 10px 14px;
+    width: 80px;
+    height: 60px;
     background: #1d1b31;
-    transition: width 0.5s ease;
-}
-
-.sidebar.open li.profile {
-    width: 20%;
-}
-
-.sidebar li .profile-details {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Adjust alignment */
-    flex-wrap: nowrap;
-}
-
-.sidebar li.profile .icon {
-    font-size: 28px;
-    /* Icon size */
-    color: #fff;
-}
-
-
-
-.sidebar li.profile .name,
-.sidebar li.profile .job {
-    font-size: 15px;
-    font-weight: 400;
-    color: #fff;
-    white-space: nowrap;
-}
-
-.sidebar li.profile .job {
-    font-size: 12px;
-}
-
-.sidebar li.profile .name {
-    opacity: 1;
-    transition: opacity 0.5s ease;
-}
-
-.sidebar li.profile .icon {
-    transition: opacity 0.5s ease;
-}
-
-.sidebar.open li.profile .icon {
-    opacity: 0;
-    /* Hide icon when sidebar is expanded */
-}
-
-.sidebar .profile #log_out {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    background: #1d1b31;
-    width: 100%;
-    height: 60px;
-    line-height: 60px;
-    border-radius: 0px;
+    padding: 0 14px;
     transition: width 0.5s ease;
 }
 
-.sidebar.open .profile #log_out {
-    width: 50px;
-    background: none;
+.sidebar.open .profile {
+    width: 250px;
 }
 
+.sidebar .profile .profile-details {
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    white-space: nowrap;
+    /* Prevent text wrapping */
+}
 
+.sidebar.open .profile .profile-details {
+    opacity: 1;
+}
 
-@media (max-width: 420px) {
-    .sidebar li .tooltip {
-        display: none;
+.sidebar .profile .name_job {
+    margin-left: 10px;
+}
+
+.sidebar .profile .name {
+    font-size: 15px;
+    font-weight: 400;
+    color: #fff;
+}
+
+.sidebar .profile .job {
+    font-size: 12px;
+    color: #fff;
+}
+
+.sidebar .profile #log_out {
+    font-size: 23px;
+    color: #fff;
+    cursor: pointer;
+    transition: color 0.4s ease;
+}
+
+.sidebar .profile #log_out:hover {
+    color: #ff6b6b;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .sidebar.open {
+        width: 200px;
+    }
+
+    .sidebar .profile {
+        width: 60px;
+    }
+
+    .sidebar.open .profile {
+        width: 200px;
     }
 }

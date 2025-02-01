@@ -1,7 +1,7 @@
 import { Container } from "../../components/index.js";
 import { message, Table } from "antd";
 import axios from "axios";
-import { REact, useEffect, useState } from "react";
+import { React, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
 import dayjs from "dayjs";
