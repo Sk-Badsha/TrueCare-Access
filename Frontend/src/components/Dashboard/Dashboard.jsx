@@ -33,8 +33,8 @@ function Dashboard() {
       <h4 className="text-center mb-4">All Doctors</h4>
       <Row>
         {doctors &&
-          doctors.map((doctor) => (
-            <DoctorList key={doctor.name} doctor={doctor} />
+          doctors.map((doctor, ind) => (
+            <DoctorList key={doctor?.userId} doctor={doctor} />
           ))}
       </Row>
     </Container>

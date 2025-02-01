@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Col, Card, Typography } from "antd"; // Import AntD's Typography for better text styling
+import { Col, Card, Typography, message } from "antd"; // Import AntD's Typography for better text styling
+import { useSelector } from "react-redux";
 import {
   CalendarOutlined,
   DollarOutlined,
@@ -12,13 +13,22 @@ const { Title, Text } = Typography;
 
 function DoctorList({ doctor }) {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.userData);
   return (
     <Col xs={24} sm={12} lg={6} className="mb-4 mx-2">
       {" "}
       {/* Responsive grid */}
       <Card
         hoverable
-        onClick={() => navigate(`/doctor/book-appointment/${doctor._id}`)}
+        onClick={() => {
+          if (user?._id === doctor?.userId) {
+            message.error(
+              "You are cheating 😂. You can't book you own appointment😂😂"
+            );
+            return;
+          }
+          navigate(`/doctor/book-appointment/${doctor._id}`);
+        }}
         style={{
           borderRadius: "15px",
           overflow: "hidden",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "../components/index.js";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { message, DatePicker, TimePicker } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -8,8 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, showLoading } from "../redux/features/alertSlice.js";
 
 function BookingPage() {
+  const backendUrl = import.meta.env.VITE_BACKEND_ENDPOINT;
   const dispatch = useDispatch();
   const params = useParams();
+  const navigate = useNavigate();
   const [doctor, setDoctor] = useState({});
   const [date, setDate] = useState();
   const [time, setTime] = useState();
@@ -17,6 +19,11 @@ function BookingPage() {
   const user = useSelector((state) => state.auth.userData);
   const getDoctorDetails = async () => {
     try {
+      if (params?.doctorId === user?._id) {
+        throw new Error(
+          "You are again cheating 😂. You can't book you own appointment😂😂"
+        );
+      }
       const res = await axios.post(
         "/api/v1/doctor/getDoctorDetailsByID",
         {
@@ -32,6 +39,7 @@ function BookingPage() {
     } catch (error) {
       console.log(error);
       message.error(error.message);
+      navigate("/dashboard");
     }
   };
   useEffect(() => {

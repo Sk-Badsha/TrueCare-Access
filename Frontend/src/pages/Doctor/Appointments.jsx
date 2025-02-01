@@ -1,10 +1,8 @@
-import React from "react";
 import { Container } from "../../components/index.js";
 import { message, Table } from "antd";
 import axios from "axios";
-import { useEffect } from "react";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { REact, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
 import dayjs from "dayjs";
 function Appointments() {
